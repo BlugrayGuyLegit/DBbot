@@ -40,7 +40,7 @@ async def check_user_status():
             previous_discord_status = current_discord_status
             if current_discord_status == 'online':
                 channel = bot.get_channel(CHANNEL_ID)
-                await channel.send(f'{member.name} is online!')
+                await channel.send(f'{member.name} is online on Discord!')
 
         # Check if Discord activity has changed
         if current_discord_activity_name != previous_discord_activity_name:
@@ -58,7 +58,7 @@ async def check_user_status():
     if steam_status != previous_steam_status:
         previous_steam_status = steam_status
         channel = bot.get_channel(CHANNEL_ID)
-        await channel.send(f'Steam user is now {steam_status}!')
+        await channel.send(f'DaFuq!?Boom! is now {steam_status} on steam!')
 
 async def get_steam_status(username):
     # You can implement logic to fetch Steam status here using other methods if needed
