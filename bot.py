@@ -8,7 +8,7 @@ intents.members = True  # Enable members to get server members
 
 bot = discord.Client(intents=intents)
 
-TARGET_USER_ID = 659349596534734856  # Replace with the target user's ID
+TARGET_USER_ID = 816388175181250610  # Replace with the target user's ID
 CHANNEL_ID = 1243967560647577710  # Replace with the channel ID to send messages
 
 @bot.event
