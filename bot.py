@@ -60,7 +60,7 @@ async def check_user_status():
     if website_status != previous_website_status:
         previous_website_status = website_status
         channel = bot.get_channel(CHANNEL_ID)
-        await channel.send(f'Website status is now {website_status}!')
+        await channel.send(f'DaFuq!?Boom! is now `Online` on steam!')
 
 async def get_website_status(url):
     async with aiohttp.ClientSession() as session:
