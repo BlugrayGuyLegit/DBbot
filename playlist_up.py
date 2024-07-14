@@ -1,0 +1,66 @@
+import discord
+import os
+import aiohttp
+from discord.ext import tasks
+from hashlib import md5
+import difflib
+
+intents = discord.Intents.default()
+bot = discord.Client(intents=intents)
+
+CHANNEL_ID = 1243967560647577710  # Remplacez par l'ID du canal où envoyer les messages
+YOUTUBE_API_KEY = os.getenv('AIzaSyB-QegWhbZG_C8IJCRM6Dgq0IxsC3eQU6k')  # Clé API YouTube
+PLAYLIST_ID = "PL-ZXraMeHBPJHXBhrNowJaQslyqtUg-tZ"  # Remplacez par l'ID de votre playlist YouTube
+
+# Stocker le contenu précédent pour détecter les mises à jour
+previous_playlist = None
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user}')
+    check_playlist_update.start()
+
+@tasks.loop(seconds=3600)  # Vérifier toutes les heures
+async def check_playlist_update():
+    global previous_playlist
+
+    current_playlist = await get_playlist_content(PLAYLIST_ID)
+    if current_playlist is None:
+        return  # Erreur lors de la récupération du contenu, ignorer cette boucle
+
+    if previous_playlist is not None and current_playlist != previous_playlist:
+        diff = get_diff(previous_playlist, current_playlist)
+        channel = bot.get_channel(CHANNEL_ID)
+        await channel.send(f'The playlist has been updated! Changes:\n{diff}')
+
+    previous_playlist = current_playlist
+
+async def get_playlist_content(playlist_id):
+    url = f'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&maxResults=50&key={YOUTUBE_API_KEY}'
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status != 200:
+                print(f'Error fetching playlist content: {response.status}')
+                return None
+            data = await response.json()
+            videos = [(item['snippet']['title'], item['snippet']['resourceId']['videoId']) for item in data.get('items', [])]
+            return videos
+
+def get_diff(old_content, new_content):
+    old_lines = format_playlist(old_content)
+    new_lines = format_playlist(new_content)
+    diff = difflib.unified_diff(
+        old_lines,
+        new_lines,
+        lineterm='',
+        fromfile='previous',
+        tofile='current'
+    )
+    return '\n'.join(diff)
+
+def format_playlist(playlist):
+    # Convertir une liste de vidéos en lignes de texte
+    lines = [f"{title} (ID: {video_id})" for title, video_id in playlist]
+    return lines
+
+bot.run(os.getenv('DISCORD_TOKEN'))
