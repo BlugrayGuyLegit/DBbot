@@ -12,50 +12,87 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Notify Discord - Start
+    - name: Notify Discord - Checkout repository started
       run: |
         curl -H "Content-Type: application/json" \
              -X POST \
-             -d "{\"content\": \"Workflow started for $GITHUB_REPOSITORY on $GITHUB_REF by $GITHUB_ACTOR\"}" \
+             -d "{\"content\": \"Checkout repository started for $GITHUB_REPOSITORY on $GITHUB_REF by $GITHUB_ACTOR\"}" \
+             ${{ secrets.DISCORD_WEBHOOK_URL }}
+             
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Notify Discord - Checkout repository completed
+      if: success()
+      run: |
+        curl -H "Content-Type: application/json" \
+             -X POST \
+             -d "{\"content\": \"Checkout repository completed for $GITHUB_REPOSITORY on $GITHUB_REF\"}" \
              ${{ secrets.DISCORD_WEBHOOK_URL }}
 
+    - name: Notify Discord - Set up Python started
+      run: |
+        curl -H "Content-Type: application/json" \
+             -X POST \
+             -d "{\"content\": \"Set up Python started for $GITHUB_REPOSITORY on $GITHUB_REF by $GITHUB_ACTOR\"}" \
+             ${{ secrets.DISCORD_WEBHOOK_URL }}
+             
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.8'
 
+    - name: Notify Discord - Set up Python completed
+      if: success()
+      run: |
+        curl -H "Content-Type: application/json" \
+             -X POST \
+             -d "{\"content\": \"Set up Python completed for $GITHUB_REPOSITORY on $GITHUB_REF\"}" \
+             ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+    - name: Notify Discord - Install dependencies started
+      run: |
+        curl -H "Content-Type: application/json" \
+             -X POST \
+             -d "{\"content\": \"Install dependencies started for $GITHUB_REPOSITORY on $GITHUB_REF by $GITHUB_ACTOR\"}" \
+             ${{ secrets.DISCORD_WEBHOOK_URL }}
+             
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install discord aiohttp beautifulsoup4
 
+    - name: Notify Discord - Install dependencies completed
+      if: success()
+      run: |
+        curl -H "Content-Type: application/json" \
+             -X POST \
+             -d "{\"content\": \"Install dependencies completed for $GITHUB_REPOSITORY on $GITHUB_REF\"}" \
+             ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+    - name: Notify Discord - Run bot started
+      run: |
+        curl -H "Content-Type: application/json" \
+             -X POST \
+             -d "{\"content\": \"Run bot started for $GITHUB_REPOSITORY on $GITHUB_REF by $GITHUB_ACTOR\"}" \
+             ${{ secrets.DISCORD_WEBHOOK_URL }}
+             
     - name: Run bot
       env:
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
       run: |
         python bot.py & python playlist_up.py
 
-    - name: Notify Discord - Success
+    - name: Notify Discord - Run bot completed
       if: success()
       run: |
         curl -H "Content-Type: application/json" \
              -X POST \
-             -d "{\"content\": \"Workflow succeeded for $GITHUB_REPOSITORY on $GITHUB_REF\"}" \
+             -d "{\"content\": \"Run bot completed for $GITHUB_REPOSITORY on $GITHUB_REF\"}" \
              ${{ secrets.DISCORD_WEBHOOK_URL }}
 
-    - name: Notify Discord - Failure
-      if: failure()
-      run: |
-        curl -H "Content-Type: application/json" \
-             -X POST \
-             -d "{\"content\": \"Workflow failed for $GITHUB_REPOSITORY on $GITHUB_REF\"}" \
-             ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-    - name: Notify Discord - Completed
+    - name: Notify Discord - Workflow completed
       if: always()
       run: |
         curl -H "Content-Type: application/json" \
