@@ -5,6 +5,7 @@ from discord.ext import tasks
 from hashlib import md5
 from bs4 import BeautifulSoup
 import difflib
+import discord.py
 
 intents = discord.Intents.default()
 
