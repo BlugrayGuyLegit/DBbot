@@ -11,15 +11,15 @@ intents = discord.Intents.default()
 
 bot = discord.Client(intents=intents)
 
-CHANNEL_ID = 1243967560647577710  # Remplacez par l'ID du canal où envoyer les messages
-TARGET_WEBSITE_URL = "https://dafuqboom.shop"  # Remplacez par l'URL que vous souhaitez surveiller
+CHANNEL_ID = 1243967560647577710  # Replace with the ID of the channel where messages should be sent
+TARGET_WEBSITE_URL = "https://dafuqboom.shop"  # Replace with the URL you want to monitor
 
-# Stocker le contenu précédent pour détecter les mises à jour
+# Store the previous content to detect updates
 previous_content = None
 
 @bot.event
 async def on_ready():
-    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='dafuqboom.shop'))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='dafuqboom.shop'))
     print(f'Logged in as {bot.user}')
     check_website_update.start()
 
@@ -29,7 +29,7 @@ async def check_website_update():
 
     current_content = await get_website_content(TARGET_WEBSITE_URL)
     if current_content is None:
-        return  # Erreur lors de la récupération du contenu, ignorer cette boucle
+        return  # Error fetching content, skip this loop
 
     if previous_content is not None and current_content != previous_content:
         diff = get_diff(previous_content, current_content)
@@ -45,7 +45,7 @@ async def get_website_content(url):
                 print(f'Error fetching website content: {response.status}')
                 return None
             content = await response.text()
-            # Nettoyer le HTML pour éliminer les changements non significatifs
+            # Clean the HTML to eliminate non-significant changes
             soup = BeautifulSoup(content, 'html.parser')
             text = soup.get_text()
             return text
