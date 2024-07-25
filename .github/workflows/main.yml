@@ -15,6 +15,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Notify Discord - Start
+      run: |
+        curl -H "Content-Type: application/json" \
+             -X POST \
+             -d "{\"content\": \"Workflow started for $GITHUB_REPOSITORY on $GITHUB_REF by $GITHUB_ACTOR\"}" \
+             ${{ secrets.DISCORD_WEBHOOK_URL }}
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -31,3 +38,27 @@ jobs:
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
       run: |
         python bot.py & python playlist_up.py
+
+    - name: Notify Discord - Success
+      if: success()
+      run: |
+        curl -H "Content-Type: application/json" \
+             -X POST \
+             -d "{\"content\": \"Workflow succeeded for $GITHUB_REPOSITORY on $GITHUB_REF\"}" \
+             ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+    - name: Notify Discord - Failure
+      if: failure()
+      run: |
+        curl -H "Content-Type: application/json" \
+             -X POST \
+             -d "{\"content\": \"Workflow failed for $GITHUB_REPOSITORY on $GITHUB_REF\"}" \
+             ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+    - name: Notify Discord - Completed
+      if: always()
+      run: |
+        curl -H "Content-Type: application/json" \
+             -X POST \
+             -d "{\"content\": \"Workflow completed for $GITHUB_REPOSITORY on $GITHUB_REF\"}" \
+             ${{ secrets.DISCORD_WEBHOOK_URL }}
