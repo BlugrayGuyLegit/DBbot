@@ -17,7 +17,7 @@ TARGET_WEBSITE_URL = "https://dafuqboom.shop"  # Remplacez par l'URL que vous so
 previous_content = None
 
 @bot.event
-    async def on_ready():
+async def on_ready():
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='dafuqboom.shop'))
     print(f'Logged in as {bot.user}')
     check_website_update.start()
