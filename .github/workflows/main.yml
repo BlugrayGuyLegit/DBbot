@@ -12,50 +12,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Notify Discord - Checkout repository started
+    - name: Notify Discord - Workflow run started
       run: |
         curl -H "Content-Type: application/json" \
              -X POST \
-             -d "{\"embeds\": [{\"title\": \"Checkout repository started\", \"description\": \"Workflow started for $GITHUB_REPOSITORY on $GITHUB_REF by $GITHUB_ACTOR\", \"color\": 3447003}]}" \
+             -d "{\"embeds\": [{\"title\": \"Workflow run started\", \"description\": \"Workflow started for $GITHUB_REPOSITORY on $GITHUB_REF by $GITHUB_ACTOR\", \"color\": 3447003}]}" \
              ${{ secrets.DISCORD_WEBHOOK_URL }}
 
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Notify Discord - Checkout repository completed
-      if: success()
-      run: |
-        curl -H "Content-Type: application/json" \
-             -X POST \
-             -d "{\"embeds\": [{\"title\": \"Checkout repository completed\", \"description\": \"Workflow completed for $GITHUB_REPOSITORY on $GITHUB_REF\", \"color\": 15158332}]}" \
-             ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-    - name: Notify Discord - Set up Python started
-      run: |
-        curl -H "Content-Type: application/json" \
-             -X POST \
-             -d "{\"embeds\": [{\"title\": \"Set up Python started\", \"description\": \"Workflow started for $GITHUB_REPOSITORY on $GITHUB_REF by $GITHUB_ACTOR\", \"color\": 3447003}]}" \
-             ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-
-    - name: Notify Discord - Set up Python completed
-      if: success()
-      run: |
-        curl -H "Content-Type: application/json" \
-             -X POST \
-             -d "{\"embeds\": [{\"title\": \"Set up Python completed\", \"description\": \"Workflow completed for $GITHUB_REPOSITORY on $GITHUB_REF\", \"color\": 15158332}]}" \
-             ${{ secrets.DISCORD_WEBHOOK_URL }}
-
     - name: Notify Discord - Install dependencies started
       run: |
         curl -H "Content-Type: application/json" \
              -X POST \
-             -d "{\"embeds\": [{\"title\": \"Install dependencies started\", \"description\": \"Workflow started for $GITHUB_REPOSITORY on $GITHUB_REF by $GITHUB_ACTOR\", \"color\": 3447003}]}" \
+             -d "{\"embeds\": [{\"title\": \"Install dependencies started\", \"description\": \"Install dependencies for $GITHUB_REPOSITORY on $GITHUB_REF by $GITHUB_ACTOR\", \"color\": 16753920}]}" \
              ${{ secrets.DISCORD_WEBHOOK_URL }}
+             
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
 
     - name: Install dependencies
       run: |
@@ -68,14 +45,14 @@ jobs:
       run: |
         curl -H "Content-Type: application/json" \
              -X POST \
-             -d "{\"embeds\": [{\"title\": \"Install dependencies completed\", \"description\": \"Workflow completed for $GITHUB_REPOSITORY on $GITHUB_REF\", \"color\": 15158332}]}" \
+             -d "{\"embeds\": [{\"title\": \"Install dependencies completed\", \"description\": \"Dependencies installed for $GITHUB_REPOSITORY on $GITHUB_REF\", \"color\": 10066329}]}" \
              ${{ secrets.DISCORD_WEBHOOK_URL }}
 
     - name: Notify Discord - Run bot started
       run: |
         curl -H "Content-Type: application/json" \
              -X POST \
-             -d "{\"embeds\": [{\"title\": \"Run bot started\", \"description\": \"Workflow started for $GITHUB_REPOSITORY on $GITHUB_REF by $GITHUB_ACTOR\", \"color\": 3447003}]}" \
+             -d "{\"embeds\": [{\"title\": \"Run bot started\", \"description\": \"Bot run started for $GITHUB_REPOSITORY on $GITHUB_REF by $GITHUB_ACTOR\", \"color\": 16753920}]}" \
              ${{ secrets.DISCORD_WEBHOOK_URL }}
 
     - name: Run bot
@@ -84,12 +61,12 @@ jobs:
       run: |
         python bot.py & python playlist_up.py
 
-    - name: Notify Discord - Run bot completed
-      if: success()
+    - name: Notify Discord - Workflow completed
+      if: always()
       run: |
         curl -H "Content-Type: application/json" \
              -X POST \
-             -d "{\"embeds\": [{\"title\": \"Run bot completed\", \"description\": \"Workflow completed for $GITHUB_REPOSITORY on $GITHUB_REF\", \"color\": 15158332}]}" \
+             -d "{\"embeds\": [{\"title\": \"Workflow completed\", \"description\": \"Workflow completed for $GITHUB_REPOSITORY on $GITHUB_REF\", \"color\": 4697616}]}" \
              ${{ secrets.DISCORD_WEBHOOK_URL }}
 
     - name: Notify Discord - Failure
@@ -98,12 +75,4 @@ jobs:
         curl -H "Content-Type: application/json" \
              -X POST \
              -d "{\"embeds\": [{\"title\": \"Workflow failed\", \"description\": \"Workflow failed for $GITHUB_REPOSITORY on $GITHUB_REF\", \"color\": 15158332}]}" \
-             ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-    - name: Notify Discord - Workflow completed
-      if: always()
-      run: |
-        curl -H "Content-Type: application/json" \
-             -X POST \
-             -d "{\"embeds\": [{\"title\": \"Workflow completed\", \"description\": \"Workflow completed for $GITHUB_REPOSITORY on $GITHUB_REF\", \"color\": 15158332}]}" \
              ${{ secrets.DISCORD_WEBHOOK_URL }}
