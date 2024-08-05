@@ -34,7 +34,7 @@ async def check_website_update():
     if previous_content is not None and current_content != previous_content:
         diff = get_diff(previous_content, current_content)
         channel = bot.get_channel(CHANNEL_ID)
-        await channel.send(f'The {TARGET_WEBSITE_URL} has been updated! Changes:\n{diff}')
+        await channel.send(f'The {TARGET_WEBSITE_URL} has been updated! Changes:\n{diff}\n\n<@&1269734191923462194>')
 
     previous_content = current_content
 
