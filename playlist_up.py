@@ -10,7 +10,7 @@ bot = discord.Client(intents=intents)
 
 CHANNEL_ID = 1243967560647577710  # Remplacez par l'ID du canal où envoyer les messages
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')  # Clé API YouTube
-PLAYLIST_ID = "PLOSCes_ANHggrUOmnU3xslmlHIPw9OQin&si=QVqzNGeO7BW74GDO"  # Remplacez par l'ID de votre playlist YouTube
+PLAYLIST_ID = "PL-ZXraMeHBPJHXBhrNowJaQslyqtUg-tZ"  # Remplacez par l'ID de votre playlist YouTube
 
 # Stocker le contenu précédent pour détecter les mises à jour
 previous_playlist = None
