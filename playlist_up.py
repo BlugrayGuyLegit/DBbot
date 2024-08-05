@@ -9,8 +9,8 @@ intents = discord.Intents.default()
 bot = discord.Client(intents=intents)
 
 CHANNEL_ID = 1243967560647577710  # Remplacez par l'ID du canal où envoyer les messages
-YOUTUBE_API_KEY = os.getenv('AIzaSyB-QegWhbZG_C8IJCRM6Dgq0IxsC3eQU6k')  # Clé API YouTube
-PLAYLIST_ID = "PL-ZXraMeHBPJHXBhrNowJaQslyqtUg-tZ"  # Remplacez par l'ID de votre playlist YouTube
+YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')  # Clé API YouTube
+PLAYLIST_ID = "PLOSCes_ANHggrUOmnU3xslmlHIPw9OQin&si=QVqzNGeO7BW74GDO"  # Remplacez par l'ID de votre playlist YouTube
 
 # Stocker le contenu précédent pour détecter les mises à jour
 previous_playlist = None
@@ -31,20 +31,29 @@ async def check_playlist_update():
     if previous_playlist is not None and current_playlist != previous_playlist:
         diff = get_diff(previous_playlist, current_playlist)
         channel = bot.get_channel(CHANNEL_ID)
-        await channel.send(f'The playlist has been updated! Changes:\n{diff}')
+        if channel:
+            await channel.send(f'The playlist has been updated! Changes:\n{diff}\n\n<@&1246455610963394672>')
+        else:
+            print(f"Channel with ID {CHANNEL_ID} not found")
 
     previous_playlist = current_playlist
 
 async def get_playlist_content(playlist_id):
-    url = f'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&maxResults=50&key={YOUTUBE_API_KEY}'
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            if response.status != 200:
-                print(f'Error fetching playlist content: {response.status}')
-                return None
-            data = await response.json()
-            videos = [(item['snippet']['title'], item['snippet']['resourceId']['videoId']) for item in data.get('items', [])]
-            return videos
+    videos = []
+    page_token = ''
+    while True:
+        url = f'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&maxResults=50&key={YOUTUBE_API_KEY}&pageToken={page_token}'
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status != 200:
+                    print(f'Error fetching playlist content: {response.status}')
+                    return None
+                data = await response.json()
+                videos.extend([(item['snippet']['title'], item['snippet']['resourceId']['videoId']) for item in data.get('items', [])])
+                page_token = data.get('nextPageToken')
+                if not page_token:
+                    break
+    return videos
 
 def get_diff(old_content, new_content):
     old_lines = format_playlist(old_content)
