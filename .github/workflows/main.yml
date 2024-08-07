@@ -74,7 +74,7 @@ jobs:
       env:
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
       run: |
-        python bot.py & python playlist_up.py | tee bot_logs.txt
+        python bot.py & python playlist_up.py & python rainbow_role.py | tee bot_logs.txt
 
     - name: Notify Discord - Send bot logs
       if: always()
