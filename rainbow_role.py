@@ -7,6 +7,7 @@ GUILD_ID = 1193262535168753824
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
+bot = discord.Client(intents=intents)
 
 def generate_random_color():
     return discord.Color(random.randint(0, 0xFFFFFF))
