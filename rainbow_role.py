@@ -7,8 +7,7 @@ ROLE_ID = 1270742938191659028
 GUILD_ID = 1193262535168753824
 
 intents = discord.Intents.default()
-
-bot = discord.Client(intents=intents)
+client = discord.Client(intents=intents)
 
 
 
@@ -27,4 +26,4 @@ async def on_ready():
         print(f'Role color changed to {new_color}')
         await asyncio.sleep(15)
 
-bot.run(os.getenv('DISCORD_TOKEN'))
+client.run(os.getenv('DISCORD_TOKEN'))
