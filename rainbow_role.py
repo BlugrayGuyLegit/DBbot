@@ -1,6 +1,7 @@
 import discord
 import random
 import asyncio
+import os
 
 ROLE_ID = 1270742938191659028
 GUILD_ID = 1193262535168753824
