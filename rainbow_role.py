@@ -23,4 +23,4 @@ async def on_ready():
         print(f'Role color changed to {new_color}')
         await asyncio.sleep(15)
 
-client.run('DISCORD_TOKEN')
+bot.run(os.getenv('DISCORD_TOKEN'))
