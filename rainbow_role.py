@@ -9,8 +9,6 @@ GUILD_ID = 1193262535168753824
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 
-
-
 def generate_random_color():
     return discord.Color(random.randint(0, 0xFFFFFF))
 
@@ -21,9 +19,13 @@ async def on_ready():
     role = guild.get_role(ROLE_ID)
     
     while True:
-        new_color = generate_random_color()
-        await role.edit(color=new_color)
-        print(f'Role color changed to {new_color}')
-        await asyncio.sleep(15)
+        try:
+            new_color = generate_random_color()
+            await role.edit(color=new_color)
+            print(f'Role color changed to {new_color}')
+            await asyncio.sleep(15)
+        except discord.DiscordException as e:
+            print(f'An error occurred: {e}')
+            await asyncio.sleep(5)  # wait a bit before retrying
 
 client.run(os.getenv('DISCORD_TOKEN'))
