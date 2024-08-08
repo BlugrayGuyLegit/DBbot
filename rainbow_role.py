@@ -35,7 +35,7 @@ async def on_ready():
             new_color = generate_random_color()
             await role.edit(color=new_color)
             print(f'Role color changed to {new_color}')
-            await asyncio.sleep(15)
+            await asyncio.sleep(60)
         except discord.DiscordException as e:
             print(f'An error occurred: {e}')
             await asyncio.sleep(5)  # wait a bit before retrying
