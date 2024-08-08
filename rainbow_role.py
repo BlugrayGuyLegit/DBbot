@@ -13,6 +13,18 @@ def generate_random_color():
     return discord.Color(random.randint(0, 0xFFFFFF))
 
 @client.event
+async def on_disconnect():
+    print("The bot has been disconnected.")
+
+@client.event
+async def on_resumed():
+    print("The bot has resumed the session.")
+
+@client.event
+async def on_ready():
+    print(f'Bot connected as {client.user} et prêt.')
+    
+@client.event
 async def on_ready():
     print(f'Bot logged in as {client.user}')
     guild = client.get_guild(GUILD_ID)
