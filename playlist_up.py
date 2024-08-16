@@ -10,7 +10,7 @@ bot = discord.Client(intents=intents)
 
 CHANNEL_ID = 1243967560647577710  # Remplacez par l'ID du canal où envoyer les messages
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')  # Clé API YouTube
-PLAYLIST_ID = "PL-ZXraMeHBPJHXBhrNowJaQslyqtUg-tZ"  # Remplacez par l'ID de votre playlist YouTube
+PLAYLIST_URL = "https://youtube.com/playlist?list=PLOSCes_ANHgg9xPLAofLUEBDLZFlGGyNU&si=bkDfC0qfcgESbd4Y"  # Lien vers la playlist YouTube
 
 # Stocker le contenu précédent pour détecter les mises à jour
 previous_playlist = None
@@ -24,7 +24,10 @@ async def on_ready():
 async def check_playlist_update():
     global previous_playlist
 
-    current_playlist = await get_playlist_content(PLAYLIST_ID)
+    # Extraire l'ID de la playlist à partir du lien
+    playlist_id = PLAYLIST_URL.split("list=")[-1]
+
+    current_playlist = await get_playlist_content(playlist_id)
     if current_playlist is None:
         return  # Erreur lors de la récupération du contenu, ignorer cette boucle
 
@@ -32,7 +35,7 @@ async def check_playlist_update():
         diff = get_diff(previous_playlist, current_playlist)
         channel = bot.get_channel(CHANNEL_ID)
         if channel:
-            await channel.send(f'The playlist has been updated! Changes:\n{diff}\n\n<@&1246455610963394672>')
+            await channel.send(f'The playlist has been updated! Check it here: {PLAYLIST_URL}\nChanges:\n{diff}\n\n<@&1246455610963394672>')
         else:
             print(f"Channel with ID {CHANNEL_ID} not found")
 
@@ -49,7 +52,7 @@ async def get_playlist_content(playlist_id):
                     print(f'Error fetching playlist content: {response.status}')
                     return None
                 data = await response.json()
-                videos.extend([(item['snippet']['title'], item['snippet']['resourceId']['videoId']) for item in data.get('items', [])])
+                videos.extend([(item['snippet']['title'], item['snippet']['resourceId']['videoId'], item['snippet']['publishedAt']) for item in data.get('items', [])])
                 page_token = data.get('nextPageToken')
                 if not page_token:
                     break
@@ -69,7 +72,7 @@ def get_diff(old_content, new_content):
 
 def format_playlist(playlist):
     # Convertir une liste de vidéos en lignes de texte
-    lines = [f"{title} (ID: {video_id})" for title, video_id in playlist]
+    lines = [f"{title} (ID: {video_id}, Published: {published_at})" for title, video_id, published_at in playlist]
     return lines
 
 bot.run(os.getenv('DISCORD_TOKEN'))
