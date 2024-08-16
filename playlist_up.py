@@ -10,36 +10,45 @@ bot = discord.Client(intents=intents)
 
 CHANNEL_ID = 1243967560647577710  # Remplacez par l'ID du canal où envoyer les messages
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')  # Clé API YouTube
-PLAYLIST_URL = "https://youtube.com/playlist?list=PLOSCes_ANHgg9xPLAofLUEBDLZFlGGyNU&si=bkDfC0qfcgESbd4Y"  # Lien vers la playlist YouTube
+
+# Liste des URLs des playlists
+PLAYLIST_URLS = [
+    "https://youtube.com/playlist?list=PL-ZXraMeHBPLA1JOBRLDLUN9C6dGTbSZH&si=MwoV5Gp-SWdjxvbT",
+    "https://youtube.com/playlist?list=PL-ZXraMeHBPJHXBhrNowJaQslyqtUg-tZ&si=M07imAq2-HCz1VPS",
+    "https://youtube.com/playlist?list=PL-ZXraMeHBPIEQ71rP-EtFoUIy8dVqam7&si=Ya-Lhymc-cDpFHx8"
+]
 
 # Stocker le contenu précédent pour détecter les mises à jour
-previous_playlist = None
+previous_playlists = {}
 
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
-    check_playlist_update.start()
+    check_playlists_update.start()
 
 @tasks.loop(seconds=3600)  # Vérifier toutes les heures
-async def check_playlist_update():
-    global previous_playlist
+async def check_playlists_update():
+    global previous_playlists
 
-    # Extraire l'ID de la playlist à partir du lien
-    playlist_id = PLAYLIST_URL.split("list=")[-1]
+    for playlist_url in PLAYLIST_URLS:
+        # Extraire l'ID de la playlist à partir du lien
+        playlist_id = playlist_url.split("list=")[-1]
 
-    current_playlist = await get_playlist_content(playlist_id)
-    if current_playlist is None:
-        return  # Erreur lors de la récupération du contenu, ignorer cette boucle
+        current_playlist = await get_playlist_content(playlist_id)
+        if current_playlist is None:
+            continue  # Erreur lors de la récupération du contenu, ignorer cette playlist
 
-    if previous_playlist is not None and current_playlist != previous_playlist:
-        diff = get_diff(previous_playlist, current_playlist)
-        channel = bot.get_channel(CHANNEL_ID)
-        if channel:
-            await channel.send(f'The playlist has been updated! Check it here: {PLAYLIST_URL}\nChanges:\n{diff}\n\n<@&1246455610963394672>')
-        else:
-            print(f"Channel with ID {CHANNEL_ID} not found")
+        # Vérifier si la playlist a été mise à jour
+        if playlist_id in previous_playlists and current_playlist != previous_playlists[playlist_id]:
+            diff = get_diff(previous_playlists[playlist_id], current_playlist)
+            channel = bot.get_channel(CHANNEL_ID)
+            if channel:
+                await channel.send(f'The playlist `{playlist_id}` has been updated! Check it here: {playlist_url}\nChanges:\n{diff}\n\n<@&1246455610963394672>')
+            else:
+                print(f"Channel with ID {CHANNEL_ID} not found")
 
-    previous_playlist = current_playlist
+        # Mettre à jour le contenu précédent
+        previous_playlists[playlist_id] = current_playlist
 
 async def get_playlist_content(playlist_id):
     videos = []
@@ -49,7 +58,7 @@ async def get_playlist_content(playlist_id):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 if response.status != 200:
-                    print(f'Error fetching playlist content: {response.status}')
+                    print(f'Error fetching playlist content for playlist {playlist_id}: {response.status}')
                     return None
                 data = await response.json()
                 videos.extend([(item['snippet']['title'], item['snippet']['resourceId']['videoId'], item['snippet']['publishedAt']) for item in data.get('items', [])])
