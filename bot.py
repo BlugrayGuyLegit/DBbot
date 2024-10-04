@@ -12,7 +12,7 @@ intents = discord.Intents.default()
 bot = discord.Client(intents=intents)
 
 CHANNEL_ID = 1243967560647577710  # Replace with the ID of the channel where messages should be sent
-TARGET_WEBSITE_URL = "https://skibiditoilet.shop"  # Replace with the URL you want to monitor
+TARGET_WEBSITE_URL = "about:blank"  # Replace with the URL you want to monitor
 
 # Store the previous content to detect updates
 previous_content = None
